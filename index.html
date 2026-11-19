@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFF6E9">
+<meta name="referrer" content="no-referrer">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Amma English</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF6E9; --ink:#3B2F2A; --muted:#8A7A70; --line:#F0E2CF; --track:#EFE3D3;
+  --green:#3CC46B; --green-d:#2A9A50; --orange:#FF9B3D; --orange-d:#E07A1A;
+  --blue:#4AA8FF; --blue-d:#2B86DB; --purple:#8B6CFF; --purple-d:#6A4BE0; --yellow:#FFC93C;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:'Baloo Thambi 2',system-ui,sans-serif;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;border:0;cursor:pointer;color:inherit;background:none;padding:0}
+[hidden]{display:none!important}
+.app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  opacity:0;pointer-events:none;transform:translateX(40px);
+  transition:opacity .35s ease, transform .5s cubic-bezier(.2,.9,.3,1.15)}
+.screen.active{opacity:1;pointer-events:auto;transform:none}
+.screen.left{transform:translateX(-40px)}
+
+/* chunky buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px 16px;border-radius:20px;
+  font-size:24px;font-weight:800;color:#fff;background:var(--green);box-shadow:0 6px 0 var(--green-d);
+  transition:transform .08s, box-shadow .08s;position:relative;overflow:hidden}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--green-d)}
+.btn.orange{background:var(--orange);box-shadow:0 6px 0 var(--orange-d)}
+.btn.orange:active{box-shadow:0 1px 0 var(--orange-d)}
+.btn.blue{background:var(--blue);box-shadow:0 6px 0 var(--blue-d)}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 6px 0 var(--line)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line)}
+.btn.wait{filter:saturate(.6) brightness(1.05)}
+.btn .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.28)}
+.btn.wait .fill{animation:fillw var(--t,1.4s) linear forwards}
+@keyframes fillw{to{width:100%}}
+.round{position:relative;flex:none;width:58px;height:58px;border-radius:50%;background:var(--blue);box-shadow:0 5px 0 var(--blue-d);
+  display:grid;place-items:center;color:#fff;font-size:26px;transition:transform .08s, box-shadow .08s}
+.round:active{transform:translateY(4px);box-shadow:0 1px 0 var(--blue-d)}
+.round svg{width:28px;height:28px;fill:#fff}
+.round.slow{background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.round.slow:active{box-shadow:0 1px 0 var(--line)}
+.round.speaking::before,.round.speaking::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:3px solid var(--blue);animation:ripple 1.2s ease-out infinite}
+.round.slow.speaking::before,.round.slow.speaking::after{border-color:var(--orange)}
+.round.speaking::after{animation-delay:.4s}
+@keyframes ripple{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.7);opacity:0}}
+
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-4deg)}}
+
+/* ---------- HOME ---------- */
+#home{overflow-y:auto}
+#home > *{flex-shrink:0}
+.hello{display:flex;align-items:center;gap:12px;margin:6px 0 14px;animation:rise .5s both}
+.hello .face{font-size:52px;line-height:1;display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 75%}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(16deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}}
+.hello h1{font-size:28px;margin:0;line-height:1.15;font-weight:800}
+.hello p{margin:2px 0 0;color:var(--muted);font-size:17px;line-height:1.3}
+
+.big-start{position:relative;overflow:hidden;border-radius:28px;padding:34px 18px 18px;margin-bottom:18px;color:#fff;text-align:center;
+  background:linear-gradient(140deg,#8B6CFF,#B46CFF);box-shadow:0 7px 0 var(--purple-d);animation:rise .5s .08s both}
+.big-start .scene{font-size:54px;line-height:1.1;letter-spacing:4px;animation:float 3s ease-in-out infinite}
+.big-start .lbl{font-size:16px;opacity:.85;margin-top:6px}
+.big-start h2{margin:0 0 12px;font-size:30px;line-height:1.15}
+.big-start .btn{background:#fff;color:var(--purple-d);box-shadow:0 6px 0 rgba(0,0,0,.2);font-size:26px;padding:16px}
+.big-start .btn:active{box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.big-start .streak{position:absolute;top:12px;right:14px;background:rgba(255,255,255,.22);border-radius:14px;padding:2px 10px;font-weight:700;font-size:16px}
+.homeSpk{position:absolute;z-index:3;top:10px;left:12px;width:48px;height:48px;background:rgba(255,255,255,.25);box-shadow:0 4px 0 rgba(0,0,0,.15);animation:hint 2s ease-in-out infinite}
+.homeSpk svg{width:24px;height:24px}
+.homeSpk.speaking{animation:none}
+@keyframes hint{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.flame{display:inline-block;animation:flicker 1.3s ease-in-out infinite}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.15) rotate(4deg)}}
+
+.sectionT{font-size:18px;color:var(--muted);font-weight:700;margin:0 4px 10px}
+.stories{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:20px}
+.scard{position:relative;background:#fff;border:2px solid var(--line);border-radius:22px;padding:14px 10px 12px;
+  box-shadow:0 5px 0 var(--line);text-align:center;animation:rise .5s both;transition:transform .08s, box-shadow .08s}
+.scard:active{transform:translateY(4px);box-shadow:0 1px 0 var(--line)}
+.scard .ico{width:70px;height:70px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;font-size:38px;
+  background:var(--c);box-shadow:inset 0 -5px 0 rgba(0,0,0,.1)}
+.scard .t{font-size:20px;font-weight:800;line-height:1.15}
+.scard .s{font-size:14px;color:var(--muted)}
+.scard .tick{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;
+  display:grid;place-items:center;font-size:16px;font-weight:800;box-shadow:0 3px 0 var(--green-d)}
+.scard.next{border-color:var(--purple);box-shadow:0 5px 0 var(--purple-d)}
+.scard.next .ico{animation:bob 1.8s ease-in-out infinite}
+
+/* ---------- STORY ---------- */
+.topbar{display:flex;align-items:center;gap:10px;flex:none}
+.icon-btn{width:44px;height:44px;border-radius:50%;font-size:24px;color:var(--muted);display:grid;place-items:center}
+.icon-btn:active{background:var(--track)}
+.bar{flex:1;height:16px;background:var(--track);border-radius:99px;overflow:hidden}
+#barFill{height:100%;width:0;background:var(--green);border-radius:99px;position:relative;transition:width .7s cubic-bezier(.2,.9,.3,1.2)}
+#barFill::after{content:'';position:absolute;left:8px;right:8px;top:3px;height:4px;border-radius:9px;background:rgba(255,255,255,.45)}
+.stitle{font-size:20px;font-weight:800;white-space:nowrap}
+
+.chat{flex:1;overflow-y:auto;padding:12px 2px 10px;display:flex;flex-direction:column;gap:12px;min-height:0;scroll-behavior:smooth}
+.nar{align-self:center;max-width:94%;background:#FFF0C7;border:2px solid #FFE08A;border-radius:20px;padding:12px 16px;text-align:center;
+  font-size:19px;line-height:1.45;animation:pop .5s cubic-bezier(.2,.9,.3,1.3) both}
+.nar .scene{display:block;font-size:46px;letter-spacing:6px;line-height:1.2;margin-bottom:4px}
+.nar.rp{background:#EDE6FF;border-color:#D3C6FF}
+.row{display:flex;align-items:flex-end;gap:8px;max-width:92%}
+.row.them{align-self:flex-start;animation:inL .45s cubic-bezier(.2,.9,.3,1.25) both}
+.row.you{align-self:flex-end;flex-direction:row-reverse;animation:inR .45s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes inL{from{opacity:0;transform:translateX(-30px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes inR{from{opacity:0;transform:translateX(30px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.85) translateY(16px)}100%{opacity:1;transform:none}}
+.av{flex:none;width:46px;height:46px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;font-size:28px}
+.bub{background:#fff;border:2px solid var(--line);border-radius:20px 20px 20px 6px;padding:10px 14px;box-shadow:0 3px 0 var(--line)}
+.row.you .bub{background:#DFF7E7;border-color:#BDEBCB;border-radius:20px 20px 6px 20px;box-shadow:0 3px 0 #BDEBCB}
+.bub b{display:block;font-size:21px;line-height:1.25}
+.bub small{display:block;font-size:16px;color:var(--muted);line-height:1.3}
+.bub .who{font-size:13px;color:var(--muted);font-weight:700}
+.bub.tap{cursor:pointer}
+.typing{display:flex;gap:5px;padding:14px 16px}
+.typing i{width:9px;height:9px;border-radius:50%;background:#C9BCAE;animation:dots 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dots{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-6px);opacity:1}}
+
+/* bottom panel */
+.panel{flex:none;padding-top:8px}
+.panel .rowBtns{display:flex;gap:12px;align-items:center}
+.panel .rowBtns .btn{flex:1}
+.practice{background:#fff;border:3px solid var(--green);border-radius:26px;padding:14px 14px 16px;box-shadow:0 6px 0 var(--green-d);
+  animation:pop .5s cubic-bezier(.2,.9,.3,1.3) both;text-align:center}
+.practice.done{animation:bounce .5s}
+@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.04)}70%{transform:scale(.98)}}
+.pLabel{font-size:14px;color:var(--muted);font-weight:700}
+.pTa{font-size:21px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.pEn{font-size:30px;font-weight:800;line-height:1.2;color:var(--green-d)}
+.pSay{display:inline-block;margin-top:4px;font-size:21px;font-weight:700;color:var(--orange-d);background:#FFF0E0;border-radius:12px;padding:2px 12px}
+.pMid{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 14px}
+.dots{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;flex:1}
+.dot{width:26px;height:26px;border-radius:50%;background:var(--track);display:grid;place-items:center;color:#fff;font-size:14px;font-weight:800;transition:background .3s}
+.dot.on{background:var(--green);animation:dotpop .5s cubic-bezier(.2,.9,.3,1.7)}
+@keyframes dotpop{0%{transform:scale(.2)}100%{transform:scale(1)}}
+.praise{position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:24px;font-weight:800;color:var(--green-d);pointer-events:none;
+  animation:floatUp 1s ease-out forwards;white-space:nowrap}
+@keyframes floatUp{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}25%{opacity:1;transform:translate(-50%,-10px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50px) scale(1)}}
+.practice{position:relative}
+
+/* ---------- DONE ---------- */
+#done{justify-content:center;align-items:center;text-align:center;gap:6px}
+.trophyWrap{position:relative;width:200px;height:170px;display:grid;place-items:center}
+.rays{position:absolute;width:260px;height:260px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,201,60,.35) 0 12deg, transparent 12deg 30deg);
+  -webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);
+  animation:spin 12s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.trophy{position:relative;font-size:110px;line-height:1}
+#done.active .trophy{animation:drop 1s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes drop{0%{transform:translateY(-220px) scale(.4) rotate(-25deg);opacity:0}100%{transform:none;opacity:1}}
+#done h2{font-size:32px;margin:4px 0 0;line-height:1.2}
+#done .sub{font-size:19px;color:var(--muted);margin:0 0 6px}
+.learned{background:#fff;border:2px solid var(--line);border-radius:20px;padding:10px 14px;width:100%;text-align:left;max-height:30vh;overflow:auto}
+.learned div{font-size:18px;font-weight:700;padding:3px 0;animation:rise .4s both}
+.learned div span{color:var(--muted);font-weight:500;font-size:15px}
+.streakLine{font-size:20px;font-weight:700;background:#FFE9D2;color:var(--orange-d);border-radius:14px;padding:4px 16px;margin:6px 0 8px}
+.doneBtns{width:100%;display:flex;flex-direction:column;gap:14px}
+
+/* sheet */
+.sheet{position:fixed;inset:0;background:rgba(40,30,20,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet.show{opacity:1;pointer-events:auto}
+.sheet .box{background:#fff;width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  transform:translateY(100%);transition:transform .4s cubic-bezier(.2,.9,.3,1.1);text-align:center}
+.sheet.show .box{transform:none}
+.sheet h3{margin:0 0 16px;font-size:24px}
+.sheet .btns{display:flex;flex-direction:column;gap:14px}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+
+@media (max-height:700px){
+  .pEn{font-size:26px}.pTa{font-size:19px}.pSay{font-size:19px}.pMid{margin:8px 0 10px}
+  .btn{font-size:22px;padding:12px}.round{width:52px;height:52px}.dot{width:22px;height:22px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <div class="hello">
+      <div class="face">👋</div>
+      <div><h1 id="greet">வணக்கம் அம்மா!</h1><p>கதை மூலம் English பேசலாம்!</p></div>
+    </div>
+
+    <div class="big-start" id="bigStart">
+      <div class="streak"><span class="flame">🔥</span> <span id="streakNum">0</span></div>
+      <button class="round homeSpk" id="homeSpk" aria-label="Listen"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
+      <div class="scene" id="nextScene">🏪</div>
+      <div class="lbl" id="nextLbl">இன்றைய கதை</div>
+      <h2 id="nextTitle">கடையில்</h2>
+      <button class="btn" id="startBtn">▶ தொடங்கு</button>
+    </div>
+
+    <div class="sectionT">எல்லா கதைகளும்</div>
+    <div class="stories" id="stories"></div>
+  </section>
+
+  <!-- STORY -->
+  <section id="story" class="screen">
+    <div class="topbar">
+      <button class="icon-btn" id="closeBtn" aria-label="Close">✕</button>
+      <div class="bar"><div id="barFill"></div></div>
+      <div class="stitle" id="stitle">🛒</div>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <!-- DONE -->
+  <section id="done" class="screen">
+    <div class="trophyWrap"><div class="rays"></div><div class="trophy">🏆</div></div>
+    <h2 id="doneTitle">அருமை அம்மா!</h2>
+    <p class="sub" id="doneSub">கதை முடிந்தது</p>
+    <div class="learned" id="learned"></div>
+    <div class="streakLine" id="streakLine"></div>
+    <div class="doneBtns">
+      <button class="btn" id="nextStoryBtn">அடுத்த கதை ›</button>
+      <button class="btn ghost" id="homeBtn">🏠 முகப்பு</button>
+    </div>
+  </section>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="box">
+    <h3>கதையை நிறுத்தவா?</h3>
+    <div class="btns">
+      <button class="btn" id="keepBtn">தொடர்ந்து பேசலாம்</button>
+      <button class="btn ghost" id="quitBtn">நிறுத்து</button>
+    </div>
+  </div>
+</div>
+<canvas id="fx"></canvas>
+
+<script>
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+const MOM_NAME = 'Geeta';        // English
+const MOM_NAME_TA = 'கீதா';      // Tamil
+const PRACTICE = 5;              // how many times she says each line
+const GAP = 1.6;                 // seconds she must wait between taps (time to actually speak)
+
+/* =========================================================
+   STORIES
+   them = the other person talks   |   you = Amma talks
+   say  = how to pronounce the English, in Tamil letters
+   ========================================================= */
+const STORIES = [
+  { id:'shop', e:'🛒', scene:'🏪 👨🏽 👩🏽', ta:'கடையில்', en:'At the shop', c:'#FFE2B8', who:'👨🏽', whoTa:'கடைக்காரர்',
+    intro:'நீங்கள் ஒரு புதிய கடைக்குப் போகிறீர்கள். கடைக்காரருக்குத் தமிழ் தெரியாது. அவர் English-ல் பேசுகிறார். நீங்களும் English-ல் பேசலாம்!',
+    lines:[
+      { w:'them', en:'Hello madam! What do you want?', ta:'வணக்கம் மேடம்! உங்களுக்கு என்ன வேண்டும்?' },
+      { w:'you',  en:'I want rice.', ta:'எனக்கு அரிசி வேண்டும்.', say:'ஐ வான்ட் ரைஸ்' },
+      { w:'them', en:'How much do you want?', ta:'எவ்வளவு வேண்டும்?' },
+      { w:'you',  en:'Give me one kilo.', ta:'எனக்கு ஒரு கிலோ கொடுங்கள்.', say:'கிவ் மீ ஒன் கிலோ' },
+      { w:'them', en:'Here it is.', ta:'இதோ, எடுத்துக்கொள்ளுங்கள்.' },
+      { w:'you',  en:'How much is this?', ta:'இது எவ்வளவு?', say:'ஹவ் மச் இஸ் திஸ்?' },
+      { w:'them', en:'Sixty rupees.', ta:'அறுபது ரூபாய்.' },
+      { w:'you',  en:'Thank you.', ta:'நன்றி.', say:'தேங்க் யூ' },
+    ]},
+  { id:'phone', e:'📞', scene:'📱 🛵 👩🏽', ta:'போன் அழைப்பு', en:'A phone call', c:'#D6ECFF', who:'🧑🏽', whoTa:'டெலிவரி',
+    intro:'உங்களுக்கு ஒரு போன் வருகிறது. ஒரு டெலிவரி பையன் English-ல் பேசுகிறார். அவருக்குப் பதில் சொல்லுங்கள்!',
+    lines:[
+      { w:'them', en:'Hello madam!', ta:'ஹலோ மேடம்!' },
+      { w:'you',  en:'Hello, who is speaking?', ta:'ஹலோ, யார் பேசுகிறீர்கள்?', say:'ஹலோ, ஹூ இஸ் ஸ்பீக்கிங்?' },
+      { w:'them', en:'I am from delivery. I have a parcel for you.', ta:'நான் டெலிவரியில் இருந்து பேசுகிறேன். உங்களுக்கு ஒரு பார்சல் இருக்கிறது.' },
+      { w:'you',  en:'Please come to my house.', ta:'தயவுசெய்து என் வீட்டுக்கு வாருங்கள்.', say:'ப்ளீஸ் கம் டு மை ஹவுஸ்' },
+      { w:'them', en:'Are you at home now?', ta:'நீங்கள் இப்போது வீட்டில் இருக்கிறீர்களா?' },
+      { w:'you',  en:'Yes, I am at home.', ta:'ஆமாம், நான் வீட்டில் இருக்கிறேன்.', say:'யெஸ், ஐ ஆம் அட் ஹோம்' },
+      { w:'them', en:'Okay, I will come in ten minutes.', ta:'சரி, பத்து நிமிடத்தில் வருகிறேன்.' },
+      { w:'you',  en:'Okay, thank you.', ta:'சரி, நன்றி.', say:'ஓகே, தேங்க் யூ' },
+    ]},
+  { id:'auto', e:'🛺', scene:'🛺 🧔🏽 👩🏽', ta:'ஆட்டோவில்', en:'In an auto', c:'#FFF0B3', who:'🧔🏽', whoTa:'ஆட்டோ டிரைவர்',
+    intro:'நீங்கள் கோவிலுக்குப் போக வேண்டும். ஒரு ஆட்டோவை நிறுத்துகிறீர்கள். டிரைவருக்குத் தமிழ் தெரியாது!',
+    lines:[
+      { w:'you',  en:'Can you go to the temple?', ta:'கோவிலுக்குப் போவீர்களா?', say:'கேன் யூ கோ டு த டெம்பிள்?' },
+      { w:'them', en:'Yes madam, come.', ta:'சரி மேடம், வாருங்கள்.' },
+      { w:'you',  en:'How much?', ta:'எவ்வளவு?', say:'ஹவ் மச்?' },
+      { w:'them', en:'Hundred rupees.', ta:'நூறு ரூபாய்.' },
+      { w:'you',  en:'That is too much.', ta:'அது ரொம்ப அதிகம்.', say:'தட் இஸ் டூ மச்' },
+      { w:'them', en:'Okay, eighty rupees.', ta:'சரி, எண்பது ரூபாய்.' },
+      { w:'you',  en:'Please go slowly.', ta:'தயவுசெய்து மெதுவாகப் போங்கள்.', say:'ப்ளீஸ் கோ ஸ்லோலி' },
+      { w:'them', en:'Okay madam.', ta:'சரி மேடம்.' },
+      { w:'you',  en:'Stop here, please.', ta:'இங்கே நிறுத்துங்கள்.', say:'ஸ்டாப் ஹியர், ப்ளீஸ்' },
+    ]},
+  { id:'doctor', e:'🏥', scene:'🏥 👩🏽‍⚕️ 👩🏽', ta:'டாக்டரிடம்', en:'At the doctor', c:'#D9F5E1', who:'👩🏽‍⚕️', whoTa:'டாக்டர்',
+    intro:'உங்களுக்குத் தலைவலி. நீங்கள் டாக்டரைப் பார்க்கப் போகிறீர்கள். டாக்டர் English-ல் கேட்கிறார்.',
+    lines:[
+      { w:'them', en:'Hello, what is the problem?', ta:'வணக்கம், என்ன பிரச்சனை?' },
+      { w:'you',  en:'I have a headache.', ta:'எனக்குத் தலைவலி.', say:'ஐ ஹேவ் எ ஹெட்ஏக்' },
+      { w:'them', en:'Since when?', ta:'எப்போதிலிருந்து?' },
+      { w:'you',  en:'Since yesterday.', ta:'நேற்றிலிருந்து.', say:'சின்ஸ் யெஸ்டர்டே' },
+      { w:'them', en:'Do you have fever?', ta:'காய்ச்சல் இருக்கிறதா?' },
+      { w:'you',  en:'No, no fever.', ta:'இல்லை, காய்ச்சல் இல்லை.', say:'நோ, நோ ஃபீவர்' },
+      { w:'them', en:'Take this tablet two times a day.', ta:'இந்த மாத்திரையை ஒரு நாளைக்கு இரண்டு முறை சாப்பிடுங்கள்.' },
+      { w:'you',  en:'Okay doctor, thank you.', ta:'சரி டாக்டர், நன்றி.', say:'ஓகே டாக்டர், தேங்க் யூ' },
+    ]},
+  { id:'neighbour', e:'🏠', scene:'🏡 👩🏻 👩🏽', ta:'புதிய பக்கத்து வீடு', en:'New neighbour', c:'#FFD3E0', who:'👩🏻', whoTa:'பக்கத்து வீட்டுக்காரர்',
+    intro:'உங்கள் பக்கத்து வீட்டுக்கு ஒருவர் புதிதாக வந்திருக்கிறார். அவருக்குத் தமிழ் தெரியாது. அவர் உங்களைப் பார்க்க வருகிறார்.',
+    lines:[
+      { w:'them', en:'Hello! I am your new neighbour.', ta:'வணக்கம்! நான் உங்கள் புதிய பக்கத்து வீட்டுக்காரர்.' },
+      { w:'you',  en:'Hello! Welcome.', ta:'வணக்கம்! வாருங்கள்.', say:'ஹலோ! வெல்கம்' },
+      { w:'them', en:'What is your name?', ta:'உங்கள் பெயர் என்ன?' },
+      { w:'you',  en:'My name is '+MOM_NAME+'.', ta:'என் பெயர் '+MOM_NAME_TA+'.', say:'மை நேம் இஸ் '+MOM_NAME_TA },
+      { w:'them', en:'Nice to meet you.', ta:'உங்களைச் சந்தித்ததில் மகிழ்ச்சி.' },
+      { w:'you',  en:'Nice to meet you too.', ta:'எனக்கும் மகிழ்ச்சி.', say:'நைஸ் டு மீட் யூ டூ' },
+      { w:'them', en:'Your house is very nice.', ta:'உங்கள் வீடு மிகவும் அழகாக இருக்கிறது.' },
+      { w:'you',  en:'Thank you. Please come in.', ta:'நன்றி. உள்ளே வாருங்கள்.', say:'தேங்க் யூ. ப்ளீஸ் கம் இன்' },
+      { w:'them', en:'Thank you.', ta:'நன்றி.' },
+      { w:'you',  en:'Will you have tea?', ta:'டீ குடிக்கிறீர்களா?', say:'வில் யூ ஹேவ் டீ?' },
+    ]},
+  { id:'way', e:'🚌', scene:'🚏 🧑🏽 👩🏽', ta:'வழி கேட்பது', en:'Asking the way', c:'#E8DDFF', who:'🧑🏽', whoTa:'வழிப்போக்கர்',
+    intro:'நீங்கள் வேறு ஊரில் இருக்கிறீர்கள். பஸ் ஸ்டாண்ட் எங்கே என்று தெரியவில்லை. ஒருவரிடம் English-ல் கேளுங்கள்!',
+    lines:[
+      { w:'you',  en:'Excuse me.', ta:'மன்னிக்கவும்.', say:'எக்ஸ்கியூஸ் மீ' },
+      { w:'them', en:'Yes, tell me.', ta:'சொல்லுங்கள்.' },
+      { w:'you',  en:'Where is the bus stand?', ta:'பஸ் ஸ்டாண்ட் எங்கே இருக்கிறது?', say:'வேர் இஸ் த பஸ் ஸ்டாண்ட்?' },
+      { w:'them', en:'Go straight and turn left.', ta:'நேராகப் போய் இடது பக்கம் திரும்புங்கள்.' },
+      { w:'you',  en:'Is it far?', ta:'அது தூரமா?', say:'இஸ் இட் ஃபார்?' },
+      { w:'them', en:'No, it is very near.', ta:'இல்லை, ரொம்பப் பக்கம்தான்.' },
+      { w:'you',  en:'Thank you very much.', ta:'மிக்க நன்றி.', say:'தேங்க் யூ வெரி மச்' },
+    ]},
+];
+
+/* =========================================================
+   Helpers / storage
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const KEY = 'ammaEnglish.story.v1';
+let S = { done:{}, streak:0, lastDay:null };
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY)) || {}); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function dayStr(d){ d = d || new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function yday(){ const d = new Date(); d.setDate(d.getDate()-1); return dayStr(d); }
+function streakNow(){ return (S.lastDay === dayStr() || S.lastDay === yday()) ? S.streak : 0; }
+function vibrate(p){ try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} }
+
+/* sounds */
+let ac = null;
+function tone(fs, type, dur, gap, vol){
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    const t0 = ac.currentTime + .02;
+    fs.forEach((f,i) => { const o = ac.createOscillator(), g = ac.createGain(), t = t0 + i*gap;
+      o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t+.015); g.gain.exponentialRampToValueAtTime(.0001, t+dur);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t+dur+.05); });
+  }catch(e){}
+}
+const sfx = {
+  tick: () => tone([880,1175], 'sine', .16, .07, .18),
+  line: () => tone([784,988,1175,1568], 'sine', .22, .08, .2),
+  win:  () => tone([523,659,784,1047,1319,1568], 'sine', .35, .1, .2),
+  tap:  () => tone([600], 'sine', .06, 0, .07),
+  pop:  () => tone([520,700], 'sine', .1, .05, .08),
+};
+
+/* =========================================================
+   Speech (English voice; Tamil voice used only if the phone has one)
+   ========================================================= */
+const synth = window.speechSynthesis;
+let enVoice = null, taVoice = null;
+function pickVoices(){
+  if (!synth) return;
+  const vs = synth.getVoices();
+  enVoice = vs.find(v => /en[-_]IN/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  taVoice = vs.find(v => /^ta/i.test(v.lang)) || null;
+}
+if (synth){ pickVoices(); synth.onvoiceschanged = pickVoices; }
+
+/*
+  Tamil voice, in this order:
+   1. the phone's own Tamil voice (Android: Google TTS → Tamil), if installed
+   2. Google's free online Tamil voice (needs internet)
+   3. silent (text only)
+*/
+let speakToken = 0, curAudio = null, onlineTaOk = true;
+const ONLINE_TA = q => 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ta&q=' + encodeURIComponent(q);
+
+function chunkText(t, max){
+  const out = []; let cur = '';
+  t.split(/(?<=[.!?,:])\s+/).forEach(p => {
+    while (p.length > max){ out.push(p.slice(0, max)); p = p.slice(max); }
+    if ((cur + ' ' + p).trim().length > max){ if (cur) out.push(cur); cur = p; } else cur = (cur + ' ' + p).trim();
+  });
+  if (cur) out.push(cur);
+  return out;
+}
+
+function playUtter(text, ta, slow, my){
+  return new Promise(res => {
+    if (!synth || my !== speakToken) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = ta ? taVoice : enVoice;
+    if (v){ u.voice = v; u.lang = v.lang; } else u.lang = ta ? 'ta-IN' : 'en-IN';
+    u.rate = slow ? .55 : (ta ? .95 : .8);
+    let ok = false; const end = () => { if (!ok){ ok = true; res(); } };
+    u.onend = end; u.onerror = end;
+    setTimeout(end, Math.max(2500, text.length * 140 + 1500));   // safety
+    try { synth.speak(u); } catch(e){ end(); }
+  });
+}
+
+function playUrl(url, my){
+  return new Promise(res => {
+    if (my !== speakToken) return res();
+    const a = new Audio(); curAudio = a;
+    let ok = false; const end = e => { if (!ok){ ok = true; if (e === 'err') onlineTaOk = false; res(); } };
+    a.onended = () => end(); a.onerror = () => end('err');
+    a.src = url;
+    const p = a.play(); if (p && p.catch) p.catch(() => end());
+    setTimeout(() => end(), 15000);
+  });
+}
+
+async function playTa(text, my){
+  if (taVoice) return playUtter(text, true, false, my);
+  if (!onlineTaOk) return;
+  for (const c of chunkText(text, 180)){
+    if (my !== speakToken) return;
+    await playUrl(ONLINE_TA(c), my);
+  }
+}
+
+// parts: [{text, ta:true/false, slow:true/false}] -> resolves when all finished
+async function speak(parts, btn){
+  const my = ++speakToken;
+  try { synth && synth.cancel(); } catch(e){}
+  if (curAudio){ try{ curAudio.pause(); }catch(e){} curAudio = null; }
+  document.querySelectorAll('.round.speaking').forEach(b => b.classList.remove('speaking'));
+  if (btn) btn.classList.add('speaking');
+  for (const p of parts){
+    if (my !== speakToken) break;
+    if (!p.text) continue;
+    if (p.ta) await playTa(p.text, my);
+    else await playUtter(p.text, false, p.slow, my);
+  }
+  if (btn) btn.classList.remove('speaking');
+}
+const sayEn = (t, slow, btn) => speak([{ text:t, slow }], btn);
+const sayTa = (t, btn) => speak([{ text:t, ta:true }], btn);
+function stopSpeak(){
+  speakToken++;
+  try{ synth && synth.cancel(); }catch(e){}
+  if (curAudio){ try{ curAudio.pause(); }catch(e){} curAudio = null; }
+  document.querySelectorAll('.round.speaking').forEach(b => b.classList.remove('speaking'));
+}
+const TA_NUM = ['', 'ஒரு', 'இரண்டு', 'மூன்று', 'நான்கு', 'ஐந்து', 'ஆறு', 'ஏழு', 'எட்டு', 'ஒன்பது', 'பத்து'];
+
+/* =========================================================
+   Screens
+   ========================================================= */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.id === id){ s.classList.remove('left'); s.classList.add('active'); }
+    else if (s.classList.contains('active')){ s.classList.remove('active'); s.classList.add('left'); setTimeout(() => s.classList.remove('left'), 500); }
+  });
+}
+
+function nextIndex(){ const i = STORIES.findIndex(s => !S.done[s.id]); return i < 0 ? 0 : i; }
+
+function renderHome(){
+  const h = new Date().getHours();
+  $('greet').textContent = (h < 12 ? 'காலை வணக்கம்' : h < 16 ? 'மதிய வணக்கம்' : 'மாலை வணக்கம்') + ' அம்மா!';
+  $('streakNum').textContent = streakNow();
+  const n = STORIES[nextIndex()];
+  $('nextScene').textContent = n.scene;
+  $('nextTitle').textContent = n.ta;
+  $('nextLbl').textContent = S.lastDay === dayStr() ? 'இன்னொரு கதை?' : 'இன்றைய கதை';
+  $('stories').innerHTML = STORIES.map((s,i) => `
+    <button class="scard ${s === n ? 'next' : ''}" data-i="${i}" style="--c:${s.c};animation-delay:${.12 + i*.05}s">
+      ${S.done[s.id] ? '<div class="tick">✓</div>' : ''}
+      <div class="ico">${s.e}</div>
+      <div class="t">${s.ta}</div><div class="s">${s.en}</div>
+    </button>`).join('');
+}
+$('stories').addEventListener('click', e => { const b = e.target.closest('.scard'); if (b) startStory(+b.dataset.i); });
+$('startBtn').onclick = () => startStory(nextIndex());
+$('homeSpk').onclick = () => {
+  const n = STORIES[nextIndex()];
+  sayTa($('greet').textContent + ' இன்றைய கதை: ' + n.ta + '. தொடங்க, வெள்ளை நிற தொடங்கு பொத்தானை அழுத்துங்கள். கீழே எல்லா கதைகளும் உள்ளன.', $('homeSpk'));
+};
+
+/* =========================================================
+   Story engine
+   ========================================================= */
+let ST = null, si = 0, steps = [], step = 0, run = 0;
+
+function startStory(i){
+  sfx.tap(); stopSpeak();
+  si = i; ST = STORIES[i]; run++;
+  steps = [{ t:'intro' }]
+    .concat(ST.lines.map(l => ({ t:l.w, l, n:PRACTICE })))
+    .concat([{ t:'rpIntro' }])
+    .concat(ST.lines.map(l => ({ t:l.w, l, n:1, rp:true })));
+  step = 0;
+  $('stitle').textContent = ST.e + ' ' + ST.ta;
+  $('chat').innerHTML = ''; $('panel').innerHTML = '';
+  show('story');
+  setTimeout(() => runStep(run), 350);
+}
+
+function bar(){ $('barFill').style.width = (step / steps.length * 100) + '%'; }
+function scrollChat(){ const c = $('chat'); requestAnimationFrame(() => c.scrollTop = c.scrollHeight); }
+function add(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); const el = d.firstChild; $('chat').appendChild(el); scrollChat(); return el; }
+
+async function runStep(r){
+  if (r !== run) return;
+  bar();
+  if (step >= steps.length) return finish();
+  const s = steps[step];
+  if (s.t === 'intro') return stepIntro(r);
+  if (s.t === 'rpIntro') return stepRpIntro(r);
+  if (s.t === 'them') return stepThem(s, r);
+  if (s.t === 'you') return stepYou(s, r);
+}
+function next(r){ if (r !== run) return; step++; runStep(r); }
+
+const SPK_SVG = '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+
+function nextPanel(label, r, replay){
+  $('panel').innerHTML = `<div class="rowBtns" style="animation:pop .4s both">
+      ${replay ? `<button class="round" id="rep" aria-label="Listen again">${SPK_SVG}</button>` : ''}
+      <button class="btn orange" id="go">${label}</button></div>`;
+  $('go').onclick = () => { sfx.tap(); stopSpeak(); next(r); };
+  if (replay) $('rep').onclick = () => replay($('rep'));
+}
+
+function stepIntro(r){
+  add(`<div class="nar"><span class="scene">${ST.scene}</span>${esc(ST.intro)}</div>`);
+  const t = 'கதை: ' + ST.ta + '. ' + ST.intro + ' கேட்டு முடித்ததும், ஆரஞ்சு பொத்தானை அழுத்துங்கள்.';
+  nextPanel('தொடங்கலாம் ›', r, b => sayTa(t, b));
+  sayTa(t, $('rep'));
+}
+
+function stepRpIntro(r){
+  sfx.line(); burst(50, .35);
+  const t = 'அருமை! இப்போது முழு உரையாடலையும் ஒருமுறை பேசுங்கள். நீங்கள்தான் இந்தக் கதையின் நாயகி!';
+  $('chat').innerHTML = '';
+  add(`<div class="nar rp"><span class="scene">🎭</span>${t}</div>`);
+  nextPanel('▶ நடிக்கலாம்', r, b => sayTa(t, b));
+  sayTa(t, $('rep'));
+}
+
+async function stepThem(s, r){
+  $('panel').innerHTML = '';
+  const typing = add(`<div class="row them"><div class="av">${ST.who}</div><div class="bub typing"><i></i><i></i><i></i></div></div>`);
+  await sleep(s.rp ? 600 : 900);
+  if (r !== run) return;
+  typing.remove(); sfx.pop();
+  const el = add(`<div class="row them"><div class="av">${ST.who}</div><div class="bub tap"><span class="who">${esc(ST.whoTa)}</span><b>${esc(s.l.en)}</b><small>${esc(s.l.ta)}</small></div></div>`);
+  const both = btn => speak([{ text:s.l.en }, { text:ST.whoTa + ' சொல்கிறார்: ' + s.l.ta, ta:true }], btn);
+  el.querySelector('.bub').onclick = () => both();
+  if (s.rp){ await sayEn(s.l.en); if (r === run){ await sleep(400); next(r); } return; }   // role-play flows on by itself
+  nextPanel('அடுத்து ›', r, b => both(b));
+  await both($('rep'));
+}
+
+function stepYou(s, r){
+  const l = s.l, need = s.n;
+  let count = 0, phase = 'listen';
+  $('panel').innerHTML = `
+    <div class="practice" id="pr">
+      <div class="pLabel">${s.rp ? '🎭 உங்கள் முறை' : '👩🏽 உங்கள் முறை — தமிழில் சொல்ல வேண்டியது:'}</div>
+      <div class="pTa">${esc(l.ta)}</div>
+      <div class="pLabel">English-ல் இப்படிச் சொல்லுங்கள்:</div>
+      <div class="pEn">${esc(l.en)}</div>
+      <div class="pSay">🗣️ ${esc(l.say || '')}</div>
+      <div class="pMid">
+        <button class="round" id="spk" aria-label="Listen">${SPK_SVG}</button>
+        <div class="dots" id="dots">${Array.from({length:need}, () => '<div class="dot"></div>').join('')}</div>
+        <button class="round slow" id="slw" aria-label="Slow">🐢</button>
+      </div>
+      <button class="btn" id="said"><span class="fill"></span><span id="saidT"></span></button>
+    </div>`;
+  const btn = $('said');
+
+  // 3 clear phases on the big button: listen → say it now → tap
+  function setPhase(p){
+    phase = p;
+    btn.classList.remove('wait', 'blue');
+    if (p === 'listen'){ btn.classList.add('blue'); $('saidT').textContent = '👂 கேளுங்கள்…'; }
+    if (p === 'say'){ btn.style.setProperty('--t', GAP + 's'); void btn.offsetWidth; btn.classList.add('wait'); $('saidT').textContent = '🗣️ இப்போது சொல்லுங்கள்'; }
+    if (p === 'tap'){ $('saidT').textContent = need === 1 ? '✓ சொன்னேன்' : `✓ சொன்னேன்  (${count}/${need})`; }
+  }
+  async function round(parts){
+    setPhase('listen');
+    await speak(parts, $('spk'));
+    if (r !== run || phase === 'done') return;
+    setPhase('say');
+    await sleep(GAP * 1000);
+    if (r !== run || phase === 'done') return;
+    setPhase('tap');
+  }
+
+  const first = s.rp
+    ? [{ text:'நீங்கள் சொல்ல வேண்டியது: ' + l.ta, ta:true }]
+    : [{ text:'உங்கள் முறை. நீங்கள் சொல்ல வேண்டியது: ' + l.ta + ' இதை English-ல் இப்படிச் சொல்லுங்கள்.', ta:true }, { text:l.en }];
+  round(first);
+
+  $('spk').onclick = () => round([{ text:l.en }]);
+  $('slw').onclick = () => { stopSpeak(); setPhase('listen'); speak([{ text:l.en, slow:true }], $('slw')).then(() => { if (r === run && phase !== 'done'){ setPhase('say'); sleep(GAP*1000).then(() => { if (r === run && phase === 'say') setPhase('tap'); }); } }); };
+
+  btn.onclick = async () => {
+    if (phase !== 'tap' || r !== run) return;
+    count++; vibrate(25); sfx.tick();
+    const d = $('dots').children[count-1]; if (d){ d.classList.add('on'); d.textContent = '✓'; }
+    if (count >= need){
+      phase = 'done';
+      floatText(pick(['அருமை! 🎉','சூப்பர்! 🌟','Very good! 👏']));
+      $('saidT').textContent = '🎉 அருமை!';
+      $('pr').classList.add('done');
+      sfx.line(); if (!s.rp) burst(30, .7);
+      await speak([{ text: s.rp ? 'சரி!' : 'அருமை!', ta:true }]);
+      await sleep(300);
+      if (r !== run) return;
+      add(`<div class="row you"><div class="av">👩🏽</div><div class="bub"><b>${esc(l.en)}</b><small>${esc(l.ta)}</small></div></div>`);
+      $('panel').innerHTML = '';
+      await sleep(500);
+      return next(r);
+    }
+    floatText(pick(['👍','Good!','நன்று!','😊']));
+    const left = need - count;
+    round([{ text:'நன்று! இன்னும் ' + (TA_NUM[left] || left) + ' முறை.', ta:true }, { text:l.en }]);
+  };
+}
+
+function floatText(t){
+  const p = $('pr'); if (!p) return;
+  const el = document.createElement('div'); el.className = 'praise'; el.textContent = t;
+  p.appendChild(el); setTimeout(() => el.remove(), 1000);
+}
+
+function finish(){
+  stopSpeak();
+  S.done[ST.id] = true;
+  const today = dayStr();
+  if (S.lastDay !== today){ S.streak = (S.lastDay === yday()) ? S.streak + 1 : 1; S.lastDay = today; }
+  save();
+  $('doneTitle').textContent = pick(['அருமை அம்மா!','சூப்பர் அம்மா!','Very good அம்மா!']);
+  $('doneSub').textContent = '“' + ST.ta + '” கதை முடிந்தது. நீங்கள் கற்றவை:';
+  $('learned').innerHTML = ST.lines.filter(l => l.w === 'you')
+    .map((l,i) => `<div style="animation-delay:${.6 + i*.12}s">✅ ${esc(l.en)} <span>${esc(l.ta)}</span></div>`).join('');
+  $('streakLine').textContent = '🔥 ' + S.streak + ' நாள் தொடர்ச்சி';
+  $('nextStoryBtn').hidden = false;
+  show('done'); sfx.win();
+  setTimeout(() => sayTa('அருமை அம்மா! ' + ST.ta + ' கதை முடிந்தது. அடுத்த கதைக்குப் பச்சை பொத்தானை அழுத்துங்கள்.'), 900);
+  setTimeout(() => burst(150, .25), 300);
+}
+
+$('nextStoryBtn').onclick = () => startStory((si + 1) % STORIES.length);
+$('homeBtn').onclick = goHome;
+$('closeBtn').onclick = () => $('sheet').classList.add('show');
+$('keepBtn').onclick = () => $('sheet').classList.remove('show');
+$('quitBtn').onclick = () => { $('sheet').classList.remove('show'); goHome(); };
+$('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') $('sheet').classList.remove('show'); });
+function goHome(){ run++; stopSpeak(); renderHome(); show('home'); $('home').scrollTop = 0; }
+
+/* =========================================================
+   Confetti
+   ========================================================= */
+const cv = $('fx'), cx = cv.getContext('2d');
+let parts = [], raf = null;
+function sizeCanvas(){ const d = window.devicePixelRatio || 1; cv.width = innerWidth*d; cv.height = innerHeight*d; cx.setTransform(d,0,0,d,0,0); }
+addEventListener('resize', sizeCanvas); sizeCanvas();
+function burst(n, y){
+  const cols = ['#3CC46B','#FF9B3D','#4AA8FF','#8B6CFF','#FFC93C','#FF5A5F'];
+  for (let i = 0; i < n; i++){ const a = Math.random()*Math.PI*2, sp = 4 + Math.random()*9;
+    parts.push({ x:innerWidth/2, y:innerHeight*y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 6, w:6+Math.random()*6, h:8+Math.random()*8,
+      r:Math.random()*6, vr:(Math.random()-.5)*.4, c:cols[i % cols.length], life:0 }); }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  parts.forEach(p => { p.vy += .32; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.max(0, 1 - p.life/140);
+    cx.fillStyle = p.c; cx.fillRect(-p.w/2, -p.h/2, p.w, p.h*Math.abs(Math.cos(p.life*.15))); cx.restore(); });
+  parts = parts.filter(p => p.y < innerHeight + 40 && p.life < 140);
+  raf = parts.length ? requestAnimationFrame(tick) : (cx.clearRect(0,0,innerWidth,innerHeight), null);
+}
+
+renderHome();
+</script>
+</body>
+</html>
